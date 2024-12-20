@@ -10,6 +10,9 @@ list = [
     "diamondSphereB", "diamondSquare", "diamondTable", "diamondTaperedBaguette", "diamondTriangle", 
     "diamondTrillionCurved", "diamondTrillionStraight"
 ]
+
+
+
 x=0
 selected_node = hou.selectedNodes()[0]
 for item in list:
