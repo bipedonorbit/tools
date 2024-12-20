@@ -1,0 +1,1 @@
+C:\USD nvidia package\scripts\usdview.bat
