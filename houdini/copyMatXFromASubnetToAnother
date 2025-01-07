@@ -1,0 +1,43 @@
+import hou
+
+def copy_mtlxmaterial_content():
+    # Get selected nodes
+    selected_nodes = hou.selectedNodes()
+    
+    # Validate selection
+    if len(selected_nodes) != 2:
+        hou.ui.displayMessage("Please select exactly two 'mtlxmaterial' nodes.", severity=hou.severityType.Warning)
+        return
+    
+    source_node, target_node = selected_nodes
+    
+    # Check if both nodes are mtlxmaterial nodes
+    if source_node.type().name() != "subnet" or target_node.type().name() != "subnet":
+        hou.ui.displayMessage(f"Both selected nodes must be 'Subnetwork' nodes. but its {source_node.type().name()}", severity=hou.severityType.Warning)
+        return
+    
+    # Copy contents of source node
+    source_children = source_node.children()
+    target_parent = target_node.parent()
+    
+    # Delete all existing children of the target node
+    for child in target_node.children():
+        child.destroy()
+    
+    # Duplicate the source node's children into the target node
+    for child in source_children:
+        new_child = child.copyTo(target_node)
+        
+        # Preserve positions for better visualization
+        new_child.setPosition(child.position())
+    
+    # Copy parameters from source to target
+    for parm in source_node.parms():
+        target_parm = target_node.parm(parm.name())
+        if target_parm:
+            target_parm.set(parm.eval())
+    
+    hou.ui.displayMessage(f"Contents of '{source_node.name()}' successfully copied to '{target_node.name()}'.", severity=hou.severityType.Message)
+
+# Execute the function
+copy_mtlxmaterial_content()
