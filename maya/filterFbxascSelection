@@ -1,0 +1,23 @@
+import maya.cmds as cmds
+
+def filter_selection_by_name():
+    # Get the current selection
+    selection = cmds.ls(selection=True)
+    
+    if not selection:
+        cmds.warning("No objects selected.")
+        return
+
+    # Filter the selection for objects that contain "FBXASC" in their name
+    valid_objects = [obj for obj in selection if "FBXASC" in obj]
+
+    # Update the selection to only include valid objects
+    if valid_objects:
+        cmds.select(valid_objects, replace=True)
+        print(f"Selected objects: {valid_objects}")
+    else:
+        cmds.select(clear=True)
+        cmds.warning("No objects contain 'FBXASC' in their name.")
+
+# Run the function
+filter_selection_by_name()
