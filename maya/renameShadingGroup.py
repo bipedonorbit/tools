@@ -7,7 +7,7 @@ def rename_shading_groups():
         connected_mat = cmds.listConnections(sg + ".surfaceShader", source=True, destination=False)
         if connected_mat:
             mat_name = connected_mat[0]
-            new_sg_name = mat_name + "_SG"
+            new_sg_name = mat_name + "_mat"
             # Rename the shading group
             try:
                 cmds.rename(sg, new_sg_name)
