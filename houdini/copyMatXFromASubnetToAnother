@@ -16,8 +16,9 @@ def master_slave_subnet():
     parent = master_node.parent()
 
     for slave in slaves:
-        # Get the name of the slave node
+        # Get the name and position of the slave node
         slave_name = slave.name()
+        slave_position = slave.position()
 
         # Delete the slave node
         slave.destroy()
@@ -28,7 +29,10 @@ def master_slave_subnet():
         # Rename the duplicated node to the slave's original name
         duplicated_node.setName(slave_name, unique_name=True)
 
-    hou.ui.displayMessage("Operation completed: Master duplicated and renamed for all slaves.")
+        # Set the duplicated node's position to the slave's original position
+        duplicated_node.setPosition(slave_position)
+
+    hou.ui.displayMessage("Operation completed: Master duplicated, renamed, and moved for all slaves.")
 
 # Run the function
 master_slave_subnet()
