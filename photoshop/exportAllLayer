@@ -1,0 +1,56 @@
+// Photoshop Script to Export All Layers as Separate PNG Files
+(function () {
+    // Check if a document is open
+    if (!app.documents.length) {
+        alert("No document open. Please open a document and try again.");
+        return;
+    }
+
+    var doc = app.activeDocument;
+    var exportFolder = Folder.selectDialog("Select a folder to export layers:");
+expor
+    if (!exportFolder) {
+        alert("No folder selected. Operation canceled.");
+        return;
+    }
+
+    // Save current preferences
+    var originalRulerUnits = app.preferences.rulerUnits;
+    app.preferences.rulerUnits = Units.PIXELS;
+
+    // Duplicate document to preserve the original
+    var tempDoc = doc.duplicate();
+
+    try {
+        // Loop through all layers
+        for (var i = tempDoc.layers.length - 1; i >= 0; i--) {
+            var layer = tempDoc.layers[i];
+            if (layer.kind !== LayerKind.NORMAL) continue;
+
+            // Hide all layers except the current one
+            for (var j = 0; j < tempDoc.layers.length; j++) {
+                tempDoc.layers[j].visible = (j === i);
+            }
+
+            // Export the current layer
+            var layerName = layer.name.replace(/[:\/\\*\?\"<>\|]/g, "_"); // Sanitize layer name
+            var filePath = new File(exportFolder + "/" + layerName + ".png");
+
+            var options = new ExportOptionsSaveForWeb();
+            options.format = SaveDocumentType.PNG;
+            options.PNG8 = false; // Use true PNG-24
+            options.transparency = true;
+            tempDoc.exportDocument(filePath, ExportType.SAVEFORWEB, options);
+        }
+
+        alert("All layers have been exported successfully!");
+    } catch (e) {
+        alert("An error occurred: " + e.message);
+    } finally {
+        // Close the duplicated document without saving
+        tempDoc.close(SaveOptions.DONOTSAVECHANGES);
+
+        // Restore preferences
+        app.preferences.rulerUnits = originalRulerUnits;
+    }
+})();
