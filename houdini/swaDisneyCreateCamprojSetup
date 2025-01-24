@@ -1,0 +1,69 @@
+import os
+import hou
+
+def main():
+    # Define node paths
+    stage_path = "/stage"
+    control_null_name = "control"
+    grid_cam_proj_name = "gridCamProj"
+    grid_cam_proj_trs_name = "gridCamProjTRS"
+    folder_path = r"I:\swaDisney_2411\03_Production\Assets\Environment\dalmatianEnviro\Renders\2dRender\AssetConcept\v001\custom\mergeLayer\acesFiles" 
+
+    # Look for the "control" null and delete it if it exists
+    stage = hou.node(stage_path)
+    if not stage:
+        raise RuntimeError(f"Stage path '{stage_path}' does not exist.")
+
+    control_null = stage.node(control_null_name)
+    if control_null:
+        control_null.destroy()
+
+    # Create a new null node named "control"
+    control_null = stage.createNode("null", control_null_name)
+    control_null.setPosition((0, 0))
+
+    
+
+    # Define folder path and search for .exr files
+    exr_files = [f for f in os.listdir(folder_path) if f.endswith(".exr")]
+
+    # Check if gridCamProj and gridCamProjTRS exist
+    grid_cam_proj = stage.node(grid_cam_proj_name)
+    grid_cam_proj_trs = stage.node(grid_cam_proj_trs_name)
+
+    if not grid_cam_proj or not grid_cam_proj_trs:
+        raise RuntimeError(f"Nodes '{grid_cam_proj_name}' or '{grid_cam_proj_trs_name}' do not exist.")
+    n=0
+    # Process each .exr file
+    for exr_file in exr_files:
+        print(f'working on  {exr_file}')
+        exr_path = os.path.join(folder_path, exr_file)
+        file_root, file_extension = os.path.splitext(exr_file)
+
+        # Duplicate gridCamProj and set its file parameter
+        new_grid_cam_proj = grid_cam_proj.copyTo(hou.node("/stage"))
+        new_grid_cam_proj.parm("file").set(exr_path)
+        new_grid_cam_proj.setPosition((n*2, -2))
+
+        # Duplicate gridCamProjTRS and connect it to the new gridCamProj
+        new_grid_cam_proj_trs = grid_cam_proj_trs.copyTo(stage)
+        new_grid_cam_proj_trs.setInput(0, new_grid_cam_proj)
+        new_grid_cam_proj_trs.setPosition((n*2, -4))
+
+        
+
+        # Add a float parameter to the "control" null
+        control_parm_name = file_root
+        control_parm_template = hou.FloatParmTemplate(control_parm_name, file_root, 1)
+        control_null.addSpareParmTuple(control_parm_template)
+
+        # Connect the control null's float parameter to the Z Transform of gridCamProjTRS
+        z_transform_parm = new_grid_cam_proj_trs.parm("tz")
+        z_transform_parm.setExpression(f'ch("../{control_null_name}/{control_parm_name}")', language=hou.exprLanguage.Hscript)
+        
+        n+=1
+
+    # Layout all nodes for better visibility
+
+
+main()
