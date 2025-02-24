@@ -4,6 +4,7 @@ from pxr import Usd, Sdf
 def replaceReferences(prim,targetPath):
     references = prim.GetReferences()
     references.ClearReferences()
+    prim.GetReferences().SetReferences([])
     if targetPath.lower().endswith(('.usdc', '.usda', '.usd')):
         references.AddReference(targetPath)
     else:
