@@ -3,7 +3,10 @@ import hou
 import os
 
 editor = hou.ui.paneTabOfType(hou.paneTabType.NetworkEditor)
-imageDir = r"M:\MECHA\02_ressource\@LOUIS\ressources\thumbnail\seq040"
+job_path = hou.getenv("JOB")
+print(job_path)
+
+imageDir = os.path.join(job_path,"02_ressource","@LOUIS","ressources","thumbnail","seq010")
 images = os.listdir(imageDir)
 
 png_files = [file_path for file_path in images if file_path.lower().endswith(".png")]
@@ -12,7 +15,7 @@ houdiniImageList=[]
 
 pan=1
 size=3
-orientation='y'
+orientation='x'
 
 
 
