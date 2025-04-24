@@ -1,0 +1,6 @@
+import sanitycheck
+import PrismInit
+core = PrismInit.pcore
+sm = core.getStateManager()
+
+sanitycheck.main(sm)
