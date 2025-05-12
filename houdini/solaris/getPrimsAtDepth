@@ -1,0 +1,35 @@
+# Get the USD stage from the LOP context
+stage = hou.pwd().editableStage()
+
+def get_prims_at_depth(root, target_depth, current_depth=0):
+    """
+    Recursively collect prims at a specific depth.
+    
+    Parameters:
+        root (pxr.Usd.Prim): The starting prim.
+        target_depth (int): The depth to reach (relative to the root).
+        current_depth (int): The current depth in traversal.
+    
+    Returns:
+        list of pxr.Usd.Prim: Prims at the target depth.
+    """
+    if current_depth == target_depth:
+        return [root]
+    
+    prims = []
+    for child in root.GetChildren():
+        prims.extend(get_prims_at_depth(child, target_depth, current_depth + 1))
+    return prims
+
+# Get the root prim (should be '/')
+root_prim = stage.GetPseudoRoot()
+
+# Get all prims exactly 3 levels below root
+depth = 3
+prims_at_depth = []
+for child in root_prim.GetChildren():
+    prims_at_depth.extend(get_prims_at_depth(child, depth - 1))
+
+# Print their paths
+for prim in prims_at_depth:
+    print(prim.GetPath())
